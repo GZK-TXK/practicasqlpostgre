@@ -1,5 +1,5 @@
 const Servicios = require('../models/servicio.model')
-const pool = require('C:/Users/GZK/Desktop/bootcamp/practicas/modulo3/practicasqlpostgre/src/database/db');
+const pool = require('../config/db/');
 const queriesService = require('../models/queries')
 
 const serviciosController = {
