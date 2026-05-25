@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/app",
     "dev": "nodemon src/app",
-    "sql": "docker exec -i some-postgres psql -U postgres -d blog < queries.sql"
+    "sql": "docker exec -i some-postgres psql -U postgres -d apisql < queries.sql"
   },
   "keywords": [],
   "author": "",

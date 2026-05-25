@@ -2,7 +2,6 @@
 
 //CREAR CONSTANTE "CREATESERVICE"
 
-const createService= ()
+const createService= (body)=>{
 
 }
-module.exports = model('Servicios', servcioSchema)

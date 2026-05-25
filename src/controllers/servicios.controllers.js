@@ -1,208 +1,101 @@
 const Servicios = require('../models/servicio.model')
-// TODO: comprobar si hay respuesta
-//GET ALL SERVICES
+const pool = require('../config/db');
+const queriesService = require('../models/queries')
 
-const traerTodosLosServicios = async (req, res) => {
-    try {
-        //TODO: acceder a la bbdd - solicitar datos
-        const servicios = await Servicios.find()
-        if (servicios.length === 0) {
-            return res.status(404).json({
+const serviciosController = {
+    crearTodosLosServicios= async (req, res) => {
+        try {
+            const resp = await pool.query(queryService.getAll);
+            const servicios = resp.rows;
+            if (servicios.length === 0) {
+                return res.status(404).json({
+                    ok: true,
+                    msg: "No hay servicios",
+                    servicios: []
+                });
+            }
+            res.status(201).json({
                 ok: true,
-                msg: 'No hay servicios registrados.',
-                servicios: []
-            });
-        }
-        res.status(200).json({
-            ok: true,
-            msg: 'Obteniendo servicios.',
-            servicios
-        })
-    }
-    catch (error) {
-        console.log(error);
-        res.status(500).json({
-            ok: false,
-            msg: 'Error al obtener los datos.'
-        })
-    }
-}
-
-//GET A SERVICE BY ID
-
-const traerUnServicioPorId = async (req, res) => {
-    try {
-        const { id } = req.params
-
-        // console.log({ id })
-        //TODO: acceder a la bbdd - solicitar datos por su id
-
-        const servicios = await Servicios.findById({ _id: id })
-        console.log(servicios)
-        // TODO: comprobar si hay respuesta  // TODO: si no existe 404  { ok: false, msg: 'no se encontro'}
-
-        if (!servicios) {
-            res.status(404).json(
-                {
-                    ok: false,
-                    msg: 'No existe servicio con ese id',
-                }
-            )
-            return
-        }
-        res.status(200).json(
-            {
-                ok: true,
-                msg: 'obteniendo un servicio',
+                msg: "Cargando servicios",
                 servicios
-            }
-        )
-
-    } catch (error) {
-        console.log(error)
-        res.status(500).json(
-            {
+            })
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({
                 ok: false,
-                msg: 'Error obteniendo un servicio'
-            }
-        )
-    }
-}
-
-//CREATE A SERVICE
-
-const crearUnServicios = async (req, res) => {
-
-    try {
-
-        const body = req.body
-        // console.log({ body })
-
-        const servicioInstanciado = new Servicios(body)
-
-
-        const resp = await servicioInstanciado.save()
-
-
-        res.status(201).json(
-            {
-                ok: true,
-                msg: 'Crear Servicio',
-                resp
-            }
-        )
-
-    } catch (error) {
-
-        console.log(error)
-
-        res.status(500).json(
-            {
-                ok: false,
-                msg: 'Error al Crear un Servicio'
-            }
-        )
-
-    }
-
-
-}
-//UPDATE A SERVICE BY ID
-
-const actualizarUnServicioPorId = async (req, res) => {
-    try {
-        //TODO: Obtener el id
-        const { id } = req.params;
-        // TODO: obtener el body
-        const body = req.body;
-        // TODO:comprobar que body existe
-        // TODO comprobar, si no existe -> 404
-        const servicioUpdate = await Servicios.findByIdAndUpdate(id, body, { new: true });
-        // TODO consultar a la bbdd si existe un documento con ese id
-        if (!servicioUpdate) {
-            return res.status(404).json({
-                ok: false,
-                msg: 'No se encontro para actualizar'
-            });
-        }
-        // TODO: si existe hago la consulta y actualizo
-        res.status(200).json({
-            ok: true,
-            msg: 'Actualizando servicio',
-            servicio: servicioActualizado
-        });
-    }
-    catch (error) {
-        console.log(error);
-        res.status(500).json({
-            ok: false,
-            msg: 'Error al actualizar servicio'
-        });
-    }
-};
-
-//DELETE A SERVICE BY ID
-
-const eliminarUnServicioPorId = async (req, res) => {
-    try {
-        //TODO: Obtener el id
-        const { id } = req.params;
-        // TODO consultar a la bbdd si existe un documento con ese id
-        const deleteServicio = await Servicios.findByIdAndDelete(id);
-        if (!deleteServicio) {
-            // TODO comprobar, si no existe -> 404
-            return res.status(404).json({
-                ok: false,
-                msg:'No se encuetra el archivo a eliminiar.'
+                msg: "Error en el servidor",
             })
         }
-        // TODO: si existe hago la consulta y elimino
-        res.status(200).json({
+    traerUnServicioPorId=async (req,res)=>{
+        try{
+            const { id }= req.params;
+            const resp= await pool.query(queryService.getById)
+            const servicio= res.rows[0];
+            if(!servicio){
+                res.status(404).json({
+                    ok:false,
+                    msg:"Eso no esta aqui",
+                })
+            } res.status(201).json({
+                ok:true,
+                msg:"Ahi tienes.",
+                servicio
+            })
+        }catch(error){
+            console.log(error)
+            res.status(500).json({
+                ok:false,
+                msg:"Se ha escacharrado la cacharra"
+            })
+        }
+    }
+    actualizarunServicioPorID= async (req,res)=>{
+        try{
+            const { id }= req.params;
+            const { servicios, descripcion, precio}= req.body;
+
+            const queryUpdate= 'UPDATE servicios SET servicios=1$, descripcion=2$, precio=3$, id_servicios=$4'
+            const resp= await pool.query(queriesService.update)
+            const servicioUpdate= resp.row[0];
+            if(!servicioUpdate){
+                res.status(404).json({
+                    ok:false,
+                    msg:"Aqui nadie ha hablado de esas cosas"
+            });
+            }
+            res.status(201).json({
             ok:true,
-            msg:'Servicio eliminado.'
-        });
+            msg:"Poniendo al dia las cosicas",
+            servicioUpdate
+            }); 
+        }catch(error){
+            console.log(error)
+                res.status(500).json({
+                    ok: false,
+                    msg:"Esto no chuta.",
+                });
+            }
     }
-    catch(error) {
-        console.log(error);
-        res.status(500).json({
-            ok:false,
-            msg: "No se pudo acceder eliminar."
-        })
-    }    
-}
-
-
-
-module.exports = {
-    traerTodosLosServicios,
-    traerUnServicioPorId,
-    crearUnServicios,
-    actualizarUnServicioPorId,
-    eliminarUnServicioPorId
-}
-
-
-
-/* 
-
-    const crearServicio=()=>{
-        
-        await obtener los datos del servicios que queremos crear
-
-        validar y sanitizar los datos
-
-        conectar con la bbdd y comprobar .....
-
-       await almacenar en bbdd
-
-
-        res.json({
-            succes:ko,
-            msg:sdf,
-            sdadf
-        })
-        
-
+    eliminarUnServicioPorId= async (req,res)=>{
+        try{
+            const { id }=req.param;
+            const resp= await pool.query(queriesService.delete,[id])
+            if(resp.length===0){
+                res.status(404).json({
+                    ok:false,
+                    msg:"Aqui no esta",
+                });
+            res.status(201).json({
+                ok:true,
+                msg:"El servicio ${ id } se ha mandado a tomar por culo."
+            })
+            }
+        }catch (error){
+            console.log(error)
+            res.status(500).json({
+                ok:false,
+                msg:"Se ha descojonado el asunto",
+            });
+        }
     }
-
-*/
+}}
