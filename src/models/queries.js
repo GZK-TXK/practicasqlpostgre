@@ -1,0 +1,3 @@
+const queriesService={
+    create: `INSERT....` 
+}
