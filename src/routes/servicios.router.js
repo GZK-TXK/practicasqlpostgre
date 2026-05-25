@@ -1,33 +1,24 @@
-const express = require('express')
-const { check } = require('express-validator')
+const express = require('express');
+const { check } = require('express-validator');
 
-const { traerTodosLosServicios, traerUnServicioPorId, crearUnServicios, actualizarUnServicioPorId, eliminarUnServicioPorId } = require('../controllers/servicios.controllers')
-const validateInputs = require('../middlewares/validateImputs')
+const serviciosController = require('../controllers/servicios.controllers');
+const validateInputs = require('../middlewares/validateImputs');
 
-const router = express.Router()
+const router = express.Router();
 
+router.get('/', [], serviciosController.traerTodosLosServicios);
 
-
-router.get('/', [], traerTodosLosServicios)
-
-router.get('/:id', [], traerUnServicioPorId)
+router.get('/:id', [], serviciosController.traerUnServicioPorId);
 
 router.post('/crear', [
-    check('titulo', 'El nombre es obligatorio').not().isEmpty(),
-    check('descripcion', 'La descripcion es obligatori').not().isEmpty(),
-    check('categoria', 'La catagotia es obligatori').not().isEmpty(),
+    check('servicios', 'El nombre del servicio es obligatorio').not().isEmpty(),
+    check('descripcion', 'La descripcion es obligatoria').not().isEmpty(),
+    check('precio', 'El precio es obligatorio y debe ser un número entero').isNumeric(),
     validateInputs
+], serviciosController.crearTodosLosServicios); 
 
+router.put('/actualizar/:id', serviciosController.actualizarunServicioPorID);
 
-], crearUnServicios)
+router.delete('/eliminar/:id', serviciosController.eliminarUnServicioPorId);
 
-router.put('/actualizar/:id', actualizarUnServicioPorId)
-
-router.delete('/eliminar/:id', eliminarUnServicioPorId)
-
-
-
-
-
-
-module.exports = router
+module.exports = router;
